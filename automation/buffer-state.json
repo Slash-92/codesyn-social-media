@@ -18,59 +18,69 @@
   "posts": {
     "2026-08-24-manifesto": {
       "postId": "6a8782cebecc101a46351bae",
-      "status": "draft",
+      "status": "scheduled",
       "dueAt": "2026-08-24T16:30:00.000Z",
-      "error": "Programmazione 2026-08-24-manifesto: Invalid post: Post must have either text or media., Instagram posts require at least one image or video., Instagram posts require a type (post, story, or reel)."
+      "bufferStatus": "scheduled"
     },
     "2026-08-25-ascolto-01": {
       "postId": "6a8782ced9b0b836e20d1f39",
-      "status": "draft",
-      "dueAt": "2026-08-25T10:30:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-25T10:30:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-08-25-ascolto-02": {
       "postId": "6a8782cfd9b0b836e20d1f51",
-      "status": "draft",
-      "dueAt": "2026-08-25T10:31:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-25T10:31:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-08-25-ascolto-03": {
       "postId": "6a8782cf4d7448d186a5c0be",
-      "status": "draft",
-      "dueAt": "2026-08-25T10:32:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-25T10:32:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-08-28-system-check-01": {
       "postId": "6a8782d05b4a6e681b1b54ae",
-      "status": "draft",
-      "dueAt": "2026-08-28T16:30:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-28T16:30:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-08-28-system-check-02": {
       "postId": "6a8782d03120534163be4fd0",
-      "status": "draft",
-      "dueAt": "2026-08-28T16:31:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-28T16:31:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-08-30-automazione": {
       "postId": "6a8782d0215134e1d70d047a",
-      "status": "draft",
-      "dueAt": "2026-08-30T09:00:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-30T09:00:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-08-31-crm": {
       "postId": "6a8782d1becc101a46351bcf",
-      "status": "draft",
-      "dueAt": "2026-08-31T16:30:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-31T16:30:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-09-01-priorita-01": {
       "postId": "6a8782d14d7448d186a5c0d6",
-      "status": "draft",
-      "dueAt": "2026-09-01T10:30:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-09-01T10:30:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-09-01-priorita-02": {
       "postId": "6a8782d1d9b0b836e20d1f7c",
-      "status": "draft",
-      "dueAt": "2026-09-01T10:31:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-09-01T10:31:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-09-01-priorita-03": {
       "postId": "6a8782d2becc101a46351be7",
       "status": "draft",
-      "dueAt": "2026-09-01T10:32:00.000Z"
+      "dueAt": "2026-09-01T10:32:00.000Z",
+      "error": "Programmazione 2026-09-01-priorita-03: Scheduled posts limit reached. You have 10 scheduled posts out of 10 allowed."
     },
     "2026-09-04-sito": {
       "postId": "6a8782d25b4a6e681b1b54c6",
@@ -83,5 +93,5 @@
       "dueAt": "2026-09-06T09:00:00.000Z"
     }
   },
-  "updatedAt": "2026-08-20T22:42:27.450Z"
+  "updatedAt": "2026-08-20T22:45:26.231Z"
 }
