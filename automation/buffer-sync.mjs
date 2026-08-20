@@ -65,12 +65,14 @@ export function buildCreateInput(job, { channelId, baseUrl }) {
   };
 }
 
-export function buildScheduleInput(postId, job) {
+export function buildScheduleInput(postId, job, { channelId, baseUrl }) {
+  const createInput = buildCreateInput(job, { channelId, baseUrl });
+  const { channelId: _channelId, needsApproval: _needsApproval, ...editable } =
+    createInput;
+
   return {
+    ...editable,
     id: postId,
-    schedulingType: "automatic",
-    mode: "customScheduled",
-    dueAt: job.dueAt,
     saveToDraft: false,
   };
 }
@@ -229,7 +231,10 @@ async function main() {
     }
 
     try {
-      const input = buildScheduleInput(entry.postId, job);
+      const input = buildScheduleInput(entry.postId, job, {
+        channelId: process.env.BUFFER_CHANNEL_ID,
+        baseUrl,
+      });
       const data = await bufferRequest(EDIT_MUTATION, { input }, apiKey);
       const post = mutationPost(data.editPost, `Programmazione ${job.id}`);
       entry.status = "scheduled";
