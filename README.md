@@ -19,6 +19,12 @@ asset Instagram già approvati. I master privati rimangono su Dropbox.
    - `BUFFER_CHANNEL_ID`
 6. Avviare manualmente il workflow `Buffer sync` la prima volta.
 
+## Verifica dei media senza contattare Buffer
+
+```bash
+node automation/buffer-sync.mjs --check-media
+```
+
 Il workflow crea tutte le bozze, programma quelle accettate dal piano gratuito
 di Buffer e riprova ogni mattina quelle rimaste fuori dalla coda.
 

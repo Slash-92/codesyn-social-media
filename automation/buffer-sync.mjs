@@ -170,6 +170,22 @@ async function main() {
     return;
   }
 
+  if (hasFlag("--check-media")) {
+    await checkPublicMedia(batch, baseUrl);
+    console.log(
+      JSON.stringify(
+        {
+          mode: "check-media",
+          urls: batch.jobs.reduce((total, job) => total + job.media.length, 0),
+          reachable: true,
+        },
+        null,
+        2,
+      ),
+    );
+    return;
+  }
+
   const apiKey = process.env.BUFFER_API_KEY;
   if (!apiKey) throw new Error("BUFFER_API_KEY non configurata.");
   if (!process.env.BUFFER_CHANNEL_ID) {
