@@ -7,6 +7,7 @@ const NOTION_VERSION = "2026-03-11";
 const BUFFER_API = "https://api.buffer.com";
 const DEFAULT_DATA_SOURCE_ID = "2be25de9-18d7-4f0f-a219-858427536a21";
 const DEFAULT_MEDIA_BASE = "https://slash-92.github.io/codesyn-social-media/media";
+const DEFAULT_SCHEDULE_HORIZON_DAYS = 10;
 const MANAGEABLE_BUFFER_STATUSES = new Set(["sent", "published", "scheduled", "buffer", "sending"]);
 const scriptDir = import.meta.dirname;
 const repoRoot = path.resolve(scriptDir, "..");
@@ -147,6 +148,12 @@ export function decideAction(page, stateEntry = {}) {
 
 export function requiresMediaCheck(action) {
   return action === "create";
+}
+
+export function shouldDeferCreation(dueAt, now = new Date(), horizonDays = DEFAULT_SCHEDULE_HORIZON_DAYS) {
+  const dueTime = Date.parse(dueAt);
+  if (Number.isNaN(dueTime)) return false;
+  return dueTime - now.getTime() > horizonDays * 86_400_000;
 }
 
 async function notionRequest(endpoint, { method = "GET", body } = {}) {
@@ -316,13 +323,18 @@ async function main() {
   const dryRun = hasFlag("--dry-run");
   const pages = await queryNotionPages();
   const state = await readJson(statePath, { schemaVersion: 1, pages: {} });
-  const summary = { total: pages.length, ignored: 0, preparedMedia: 0, created: 0, reconciled: 0, errors: 0 };
+  const horizonDays = Number.parseFloat(process.env.BUFFER_SCHEDULE_HORIZON_DAYS || String(DEFAULT_SCHEDULE_HORIZON_DAYS));
+  const summary = { total: pages.length, ignored: 0, deferred: 0, preparedMedia: 0, created: 0, reconciled: 0, errors: 0 };
   for (const page of pages) {
     if (!page.ready || !["Approvato", "Programmato", "Pubblicato", "Errore automazione"].includes(page.status)) {
       summary.ignored += 1;
       continue;
     }
     const action = decideAction(page, state.pages[page.id]);
+    if (action === "create" && shouldDeferCreation(page.dueAt, new Date(), horizonDays)) {
+      summary.deferred += 1;
+      continue;
+    }
     if (dryRun) {
       console.log(JSON.stringify({ page: page.title, key: page.key, action, bufferIds: page.bufferIds }, null, 2));
       continue;
