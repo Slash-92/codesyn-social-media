@@ -2,6 +2,7 @@
   "schemaVersion": 1,
   "batch": [
     "2026-08-24-manifesto",
+    "2026-08-23-sito-ai",
     "2026-08-25-ascolto-01",
     "2026-08-25-ascolto-02",
     "2026-08-25-ascolto-03",
@@ -21,6 +22,11 @@
       "status": "scheduled",
       "dueAt": "2026-08-22T09:00:00.000Z",
       "bufferStatus": "scheduled"
+    },
+    "2026-08-23-sito-ai": {
+      "postId": "6a8845121b38003a90cba8f8",
+      "status": "draft",
+      "dueAt": "2026-08-23T09:00:00.000Z"
     },
     "2026-08-25-ascolto-01": {
       "postId": "6a8782ced9b0b836e20d1f39",
@@ -93,5 +99,5 @@
       "dueAt": "2026-09-06T09:00:00.000Z"
     }
   },
-  "updatedAt": "2026-08-21T05:46:24.150Z"
+  "updatedAt": "2026-08-21T12:31:14.749Z"
 }
