@@ -9,6 +9,7 @@ import {
   isManageableBufferStatus,
   parseNotionPage,
   requiresMediaCheck,
+  shouldDeferCreation,
 } from "./notion-sync.mjs";
 
 function richText(content) {
@@ -100,6 +101,13 @@ test("lo stato transitorio sending resta gestibile senza falso errore", () => {
 test("la riconciliazione non dipende dalla disponibilita temporanea dei media", () => {
   assert.equal(requiresMediaCheck("create"), true);
   assert.equal(requiresMediaCheck("reconcile"), false);
+});
+
+test("una nuova pubblicazione resta differita oltre l'orizzonte Buffer", () => {
+  const now = new Date("2026-08-21T12:00:00.000Z");
+  assert.equal(shouldDeferCreation("2026-09-09T16:30:00.000Z", now, 10), true);
+  assert.equal(shouldDeferCreation("2026-08-30T16:30:00.000Z", now, 10), false);
+  assert.equal(shouldDeferCreation("data-non-valida", now, 10), false);
 });
 
 test("la baseline dei 14 ID Buffer resta preservata senza duplicati", async () => {
