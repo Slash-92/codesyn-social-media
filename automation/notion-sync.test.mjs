@@ -6,6 +6,7 @@ import {
   buildJobs,
   decideAction,
   deriveEntryStatus,
+  isEligibleSyncPage,
   isManageableBufferStatus,
   parseNotionPage,
   requiresMediaCheck,
@@ -108,6 +109,13 @@ test("una nuova pubblicazione resta differita oltre l'orizzonte Buffer", () => {
   assert.equal(shouldDeferCreation("2026-09-09T16:30:00.000Z", now, 10), true);
   assert.equal(shouldDeferCreation("2026-08-30T16:30:00.000Z", now, 10), false);
   assert.equal(shouldDeferCreation("data-non-valida", now, 10), false);
+});
+
+test("una riga già pubblicata non consuma più richieste Buffer", () => {
+  const published = parseNotionPage(pageFixture({ Stato: { type: "select", select: { name: "Pubblicato" } } }));
+  const scheduled = parseNotionPage(pageFixture({ Stato: { type: "select", select: { name: "Programmato" } } }));
+  assert.equal(isEligibleSyncPage(published), false);
+  assert.equal(isEligibleSyncPage(scheduled), true);
 });
 
 test("la baseline dei 14 ID Buffer resta preservata senza duplicati", async () => {
