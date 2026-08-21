@@ -33,7 +33,7 @@ Non inserire mai token o password nei file del repository.
 
 ## Notion come fonte editoriale
 
-Il workflow `Notion Buffer sync` controlla il piano editoriale Codesyn ogni dieci minuti. Una riga entra nella pubblicazione soltanto quando:
+Il workflow `Notion Buffer sync` controlla il piano editoriale Codesyn alle 08:07 e alle 20:07, nel fuso `Europe/Rome`. Una riga entra nella pubblicazione soltanto quando:
 
 - `Brand` è `Codesyn`;
 - `Stato` è `Approvato`;
