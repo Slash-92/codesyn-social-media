@@ -145,6 +145,10 @@ export function decideAction(page, stateEntry = {}) {
   return "ignore";
 }
 
+export function requiresMediaCheck(action) {
+  return action === "create";
+}
+
 async function notionRequest(endpoint, { method = "GET", body } = {}) {
   const token = process.env.NOTION_API_TOKEN;
   if (!token) throw new Error("NOTION_API_TOKEN non configurato");
@@ -334,7 +338,7 @@ async function main() {
         summary.ignored += 1;
         continue;
       }
-      await checkMedia(page.publicUrls);
+      if (requiresMediaCheck(action)) await checkMedia(page.publicUrls);
       const jobs = buildJobs(page);
       if (action === "reconcile") {
         await reconcile(page, jobs, state);

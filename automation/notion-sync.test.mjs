@@ -8,6 +8,7 @@ import {
   deriveEntryStatus,
   isManageableBufferStatus,
   parseNotionPage,
+  requiresMediaCheck,
 } from "./notion-sync.mjs";
 
 function richText(content) {
@@ -94,6 +95,11 @@ test("lo stato transitorio sending resta gestibile senza falso errore", () => {
   assert.equal(isManageableBufferStatus("sending"), true);
   assert.equal(deriveEntryStatus(["sending"]), "scheduled");
   assert.equal(deriveEntryStatus(["sent"]), "published");
+});
+
+test("la riconciliazione non dipende dalla disponibilita temporanea dei media", () => {
+  assert.equal(requiresMediaCheck("create"), true);
+  assert.equal(requiresMediaCheck("reconcile"), false);
 });
 
 test("la baseline dei 14 ID Buffer resta preservata senza duplicati", async () => {
