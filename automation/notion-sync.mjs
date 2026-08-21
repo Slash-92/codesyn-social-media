@@ -150,6 +150,10 @@ export function requiresMediaCheck(action) {
   return action === "create";
 }
 
+export function isEligibleSyncPage(page) {
+  return page.ready && ["Approvato", "Programmato", "Errore automazione"].includes(page.status);
+}
+
 export function shouldDeferCreation(dueAt, now = new Date(), horizonDays = DEFAULT_SCHEDULE_HORIZON_DAYS) {
   const dueTime = Date.parse(dueAt);
   if (Number.isNaN(dueTime)) return false;
@@ -206,7 +210,12 @@ async function bufferRequest(query, variables) {
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
     body: JSON.stringify({ query, variables }),
   });
-  if (!response.ok) throw new Error(`Buffer HTTP ${response.status}: ${await response.text()}`);
+  if (!response.ok) {
+    const message = `Buffer HTTP ${response.status}: ${await response.text()}`;
+    const error = new Error(message);
+    if (response.status === 429) error.code = "BUFFER_RATE_LIMIT";
+    throw error;
+  }
   const payload = await response.json();
   if (payload.errors?.length) throw new Error(`Buffer GraphQL: ${payload.errors.map((error) => error.message).join("; ")}`);
   return payload.data;
@@ -324,9 +333,9 @@ async function main() {
   const pages = await queryNotionPages();
   const state = await readJson(statePath, { schemaVersion: 1, pages: {} });
   const horizonDays = Number.parseFloat(process.env.BUFFER_SCHEDULE_HORIZON_DAYS || String(DEFAULT_SCHEDULE_HORIZON_DAYS));
-  const summary = { total: pages.length, ignored: 0, deferred: 0, preparedMedia: 0, created: 0, reconciled: 0, errors: 0 };
+  const summary = { total: pages.length, ignored: 0, deferred: 0, preparedMedia: 0, created: 0, reconciled: 0, errors: 0, rateLimited: false };
   for (const page of pages) {
-    if (!page.ready || !["Approvato", "Programmato", "Pubblicato", "Errore automazione"].includes(page.status)) {
+    if (!isEligibleSyncPage(page)) {
       summary.ignored += 1;
       continue;
     }
@@ -360,6 +369,11 @@ async function main() {
         summary.created += 1;
       }
     } catch (error) {
+      if (error.code === "BUFFER_RATE_LIMIT") {
+        summary.rateLimited = true;
+        console.warn(`${page.key}: limite Buffer raggiunto; sincronizzazione interrotta e rinviata al prossimo passaggio.`);
+        break;
+      }
       summary.errors += 1;
       console.error(`${page.key}: ${error.message}`);
       await updateNotion(page.id, { status: "Errore automazione", error: error.message, syncedAt: new Date().toISOString() });
