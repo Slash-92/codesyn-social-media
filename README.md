@@ -44,6 +44,8 @@ Il campo `Buffer IDs` è la protezione principale contro i duplicati. Se contien
 
 Le nuove pubblicazioni senza ID Buffer vengono create soltanto quando la data prevista entra nella finestra dei 10 giorni successivi. In questo modo il piano può essere preparato in anticipo senza saturare la coda Buffer.
 
+Le righe già marcate `Pubblicato` non vengono più interrogate nelle esecuzioni successive. Se Buffer restituisce il limite temporaneo `429`, il ciclo si ferma al primo rifiuto e riprova alla sincronizzazione seguente senza trasformare tutte le righe restanti in errori.
+
 I file allegati alla proprietà `Media` vengono copiati in `media/notion/<chiave>/`. La prima esecuzione prepara e pubblica i file; una successiva esecuzione verifica gli URL GitHub Pages e programma il contenuto in Buffer. Sono supportati feed singoli, caroselli, Stories e Reel MP4.
 
 Secrets richiesti:
