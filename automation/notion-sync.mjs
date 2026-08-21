@@ -7,11 +7,20 @@ const NOTION_VERSION = "2026-03-11";
 const BUFFER_API = "https://api.buffer.com";
 const DEFAULT_DATA_SOURCE_ID = "2be25de9-18d7-4f0f-a219-858427536a21";
 const DEFAULT_MEDIA_BASE = "https://slash-92.github.io/codesyn-social-media/media";
+const MANAGEABLE_BUFFER_STATUSES = new Set(["sent", "published", "scheduled", "buffer", "sending"]);
 const scriptDir = import.meta.dirname;
 const repoRoot = path.resolve(scriptDir, "..");
 const statePath = process.env.NOTION_SYNC_STATE_PATH
   ? path.resolve(process.env.NOTION_SYNC_STATE_PATH)
   : path.join(scriptDir, "notion-sync-state.json");
+
+export function isManageableBufferStatus(status) {
+  return MANAGEABLE_BUFFER_STATUSES.has(status);
+}
+
+export function deriveEntryStatus(statuses) {
+  return statuses.every((status) => ["sent", "published"].includes(status)) ? "published" : "scheduled";
+}
 
 function hasFlag(flag) {
   return process.argv.includes(flag);
@@ -172,6 +181,7 @@ async function updateNotion(pageId, changes) {
   if ("bufferIds" in changes) properties["Buffer IDs"] = textProperty(changes.bufferIds.join("\n"));
   if ("publicUrls" in changes) properties["URL media pubblici"] = textProperty(changes.publicUrls.join("\n"));
   if ("status" in changes) properties.Stato = { select: { name: changes.status } };
+  if ("publishedUrl" in changes) properties["Link pubblicato"] = { url: changes.publishedUrl || null };
   if ("error" in changes) properties["Errore automazione"] = textProperty(changes.error ?? "");
   if ("syncedAt" in changes) properties["Ultima sincronizzazione"] = { date: { start: changes.syncedAt } };
   await notionRequest(`/pages/${pageId}`, { method: "PATCH", body: { properties } });
@@ -193,7 +203,7 @@ async function bufferRequest(query, variables) {
 
 const CREATE_POST = `mutation CreatePost($input: CreatePostInput!) { createPost(input: $input) { __typename ... on PostActionSuccess { post { id status dueAt } } ... on MutationError { message } } }`;
 const EDIT_POST = `mutation EditPost($input: EditPostInput!) { editPost(input: $input) { __typename ... on PostActionSuccess { post { id status dueAt } } ... on MutationError { message } } }`;
-const GET_POST = `query GetPost($input: PostInput!) { post(input: $input) { id status dueAt sentAt } }`;
+const GET_POST = `query GetPost($input: PostInput!) { post(input: $input) { id status dueAt sentAt externalLink } }`;
 
 function actionPost(payload, operation) {
   if (payload.__typename === "PostActionSuccess") return payload.post;
@@ -240,7 +250,7 @@ async function createAndSchedule(page, jobs, state) {
   for (let index = 0; index < jobs.length; index += 1) {
     const postId = ids[index];
     const current = await bufferRequest(GET_POST, { input: { id: postId } });
-    if (["sent", "published", "scheduled", "buffer"].includes(current.post.status)) {
+    if (isManageableBufferStatus(current.post.status)) {
       entry.jobs[index] = { postId, status: current.post.status, dueAt: current.post.dueAt ?? jobs[index].dueAt };
       continue;
     }
@@ -263,6 +273,7 @@ async function reconcile(page, jobs, state) {
   const ids = page.bufferIds.length ? page.bufferIds : entry.bufferIds ?? [];
   if (ids.length !== jobs.length) throw new Error(`${page.title}: ${ids.length} ID Buffer per ${jobs.length} operazioni previste`);
   const statuses = [];
+  const publishedUrls = [];
   for (let index = 0; index < ids.length; index += 1) {
     const data = await bufferRequest(GET_POST, { input: { id: ids[index] } });
     let post = data.post;
@@ -274,17 +285,23 @@ async function reconcile(page, jobs, state) {
       const scheduled = await bufferRequest(EDIT_POST, { input: { ...editable, id: ids[index] } });
       post = actionPost(scheduled.editPost, `Ripresa bozza ${page.key}/${index + 1}`);
     }
-    if (!["sent", "published", "scheduled", "buffer"].includes(post.status)) {
+    if (!isManageableBufferStatus(post.status)) {
       throw new Error(`${page.title}: stato Buffer non gestibile (${post.status}) per ${post.id}`);
     }
     statuses.push(post.status);
+    if (post.externalLink) publishedUrls.push(post.externalLink);
     entry.jobs[index] = { postId: post.id, status: post.status, dueAt: post.dueAt ?? jobs[index].dueAt };
   }
   entry.bufferIds = ids;
-  entry.status = statuses.every((status) => ["sent", "published"].includes(status)) ? "published" : "scheduled";
+  entry.status = deriveEntryStatus(statuses);
   await saveState(state);
   const status = entry.status === "published" ? "Pubblicato" : "Programmato";
-  await updateNotion(page.id, { ...(page.status !== status ? { status } : {}), error: "", syncedAt: new Date().toISOString() });
+  await updateNotion(page.id, {
+    ...(page.status !== status ? { status } : {}),
+    ...(entry.status === "published" && publishedUrls[0] ? { publishedUrl: publishedUrls[0] } : {}),
+    error: "",
+    syncedAt: new Date().toISOString(),
+  });
 }
 
 async function main() {
