@@ -201,6 +201,7 @@ async function main() {
     batch: batch.jobs.map((job) => job.id),
     posts: {},
   });
+  state.batch = batch.jobs.map((job) => job.id);
 
   for (const job of batch.jobs) {
     if (state.posts[job.id]?.postId) continue;
