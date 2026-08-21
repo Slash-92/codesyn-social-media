@@ -1,7 +1,14 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import { buildBufferInput, buildJobs, decideAction, parseNotionPage } from "./notion-sync.mjs";
+import {
+  buildBufferInput,
+  buildJobs,
+  decideAction,
+  deriveEntryStatus,
+  isManageableBufferStatus,
+  parseNotionPage,
+} from "./notion-sync.mjs";
 
 function richText(content) {
   return { type: "rich_text", rich_text: content ? [{ plain_text: content }] : [] };
@@ -81,6 +88,12 @@ test("gli URL pubblici mancanti preparano i file senza chiamare Buffer", () => {
     },
   }));
   assert.equal(decideAction(parsed), "prepare-media");
+});
+
+test("lo stato transitorio sending resta gestibile senza falso errore", () => {
+  assert.equal(isManageableBufferStatus("sending"), true);
+  assert.equal(deriveEntryStatus(["sending"]), "scheduled");
+  assert.equal(deriveEntryStatus(["sent"]), "published");
 });
 
 test("la baseline dei 14 ID Buffer resta preservata senza duplicati", async () => {
