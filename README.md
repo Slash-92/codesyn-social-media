@@ -17,7 +17,7 @@ asset Instagram già approvati. I master privati rimangono su Dropbox.
 5. Aggiungere nei Secrets del repository:
    - `BUFFER_API_KEY`
    - `BUFFER_CHANNEL_ID`
-6. Avviare manualmente il workflow `Buffer sync` la prima volta.
+6. Usare `Buffer sync` solo come fallback manuale; la fonte automatica è Notion.
 
 ## Verifica dei media senza contattare Buffer
 
@@ -25,8 +25,9 @@ asset Instagram già approvati. I master privati rimangono su Dropbox.
 node automation/buffer-sync.mjs --check-media
 ```
 
-Il workflow crea tutte le bozze, programma quelle accettate dal piano gratuito
-di Buffer e riprova ogni mattina quelle rimaste fuori dalla coda.
+Il workflow legacy crea le bozze e prova a riempire gli slot Buffer soltanto
+quando viene avviato manualmente. Non ha una schedulazione autonoma, così non
+entra in concorrenza con Notion.
 
 Non inserire mai token o password nei file del repository.
 
