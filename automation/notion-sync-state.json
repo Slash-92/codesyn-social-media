@@ -3,58 +3,160 @@
   "pages": {
     "3c200188-58b9-810a-bac6-de9f94156076": {
       "key": "2026-08-24-manifesto",
-      "bufferIds": ["6a8782cebecc101a46351bae"],
+      "bufferIds": [
+        "6a8782cebecc101a46351bae"
+      ],
       "status": "published",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782cebecc101a46351bae",
+          "status": "sent",
+          "dueAt": "2026-08-21T11:30:00.000Z"
+        }
+      }
     },
     "3c300188-58b9-813e-a1f8-c65e0e6b719b": {
       "key": "2026-08-23-sito-ai",
-      "bufferIds": ["6a8845121b38003a90cba8f8"],
+      "bufferIds": [
+        "6a8845121b38003a90cba8f8"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8845121b38003a90cba8f8",
+          "status": "scheduled",
+          "dueAt": "2026-08-23T09:00:00.000Z"
+        }
+      }
     },
     "3c200188-58b9-8183-affa-d37656c2f79f": {
       "key": "2026-08-25-ascolto",
-      "bufferIds": ["6a8782ced9b0b836e20d1f39", "6a8782cfd9b0b836e20d1f51", "6a8782cf4d7448d186a5c0be"],
+      "bufferIds": [
+        "6a8782ced9b0b836e20d1f39",
+        "6a8782cfd9b0b836e20d1f51",
+        "6a8782cf4d7448d186a5c0be"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782ced9b0b836e20d1f39",
+          "status": "scheduled",
+          "dueAt": "2026-08-25T10:30:00.000Z"
+        },
+        "1": {
+          "postId": "6a8782cfd9b0b836e20d1f51",
+          "status": "scheduled",
+          "dueAt": "2026-08-25T10:31:00.000Z"
+        },
+        "2": {
+          "postId": "6a8782cf4d7448d186a5c0be",
+          "status": "scheduled",
+          "dueAt": "2026-08-25T10:32:00.000Z"
+        }
+      }
     },
     "3c200188-58b9-81ee-90a4-f7179b9a4482": {
       "key": "2026-08-28-system-check",
-      "bufferIds": ["6a8782d05b4a6e681b1b54ae", "6a8782d03120534163be4fd0"],
+      "bufferIds": [
+        "6a8782d05b4a6e681b1b54ae",
+        "6a8782d03120534163be4fd0"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782d05b4a6e681b1b54ae",
+          "status": "scheduled",
+          "dueAt": "2026-08-28T16:30:00.000Z"
+        },
+        "1": {
+          "postId": "6a8782d03120534163be4fd0",
+          "status": "scheduled",
+          "dueAt": "2026-08-28T16:31:00.000Z"
+        }
+      }
     },
     "3c200188-58b9-81cb-af43-f923ae2a6b07": {
       "key": "2026-08-30-automazione",
-      "bufferIds": ["6a8782d0215134e1d70d047a"],
+      "bufferIds": [
+        "6a8782d0215134e1d70d047a"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782d0215134e1d70d047a",
+          "status": "scheduled",
+          "dueAt": "2026-08-30T09:00:00.000Z"
+        }
+      }
     },
     "3c200188-58b9-8183-a72f-f74a64ef9e0a": {
       "key": "2026-08-31-crm",
-      "bufferIds": ["6a8782d1becc101a46351bcf"],
+      "bufferIds": [
+        "6a8782d1becc101a46351bcf"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782d1becc101a46351bcf",
+          "status": "scheduled",
+          "dueAt": "2026-08-31T16:30:00.000Z"
+        }
+      }
     },
     "3c200188-58b9-81a7-91f9-fbf1640b0232": {
       "key": "2026-09-01-priorita",
-      "bufferIds": ["6a8782d14d7448d186a5c0d6", "6a8782d1d9b0b836e20d1f7c", "6a8782d2becc101a46351be7"],
+      "bufferIds": [
+        "6a8782d14d7448d186a5c0d6",
+        "6a8782d1d9b0b836e20d1f7c",
+        "6a8782d2becc101a46351be7"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782d14d7448d186a5c0d6",
+          "status": "scheduled",
+          "dueAt": "2026-09-01T10:30:00.000Z"
+        },
+        "1": {
+          "postId": "6a8782d1d9b0b836e20d1f7c",
+          "status": "scheduled",
+          "dueAt": "2026-09-01T10:31:00.000Z"
+        },
+        "2": {
+          "postId": "6a8782d2becc101a46351be7",
+          "status": "scheduled",
+          "dueAt": "2026-09-01T10:32:00.000Z"
+        }
+      }
     },
     "3c200188-58b9-8148-86b6-d01dd0e4b6bb": {
       "key": "2026-09-04-sito",
-      "bufferIds": ["6a8782d25b4a6e681b1b54c6"],
+      "bufferIds": [
+        "6a8782d25b4a6e681b1b54c6"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782d25b4a6e681b1b54c6",
+          "status": "scheduled",
+          "dueAt": "2026-09-04T16:30:00.000Z"
+        }
+      }
     },
     "3c200188-58b9-8178-85b6-ce5ad14f157a": {
       "key": "2026-09-06-referente",
-      "bufferIds": ["6a8782d35b4a6e681b1b54de"],
+      "bufferIds": [
+        "6a8782d35b4a6e681b1b54de"
+      ],
       "status": "scheduled",
-      "jobs": {}
+      "jobs": {
+        "0": {
+          "postId": "6a8782d35b4a6e681b1b54de",
+          "status": "scheduled",
+          "dueAt": "2026-09-06T09:00:00.000Z"
+        }
+      }
     }
   },
-  "updatedAt": "2026-08-21T12:33:02.000Z"
+  "updatedAt": "2026-08-21T13:41:43.888Z"
 }
