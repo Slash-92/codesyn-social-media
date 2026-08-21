@@ -42,6 +42,8 @@ Il workflow `Notion Buffer sync` controlla il piano editoriale Codesyn alle 08:0
 
 Il campo `Buffer IDs` è la protezione principale contro i duplicati. Se contiene uno o più ID, il workflow esegue esclusivamente una riconciliazione dello stato e non crea nuovi post. Anche `automation/notion-sync-state.json` conserva gli ID dopo ogni creazione.
 
+Le nuove pubblicazioni senza ID Buffer vengono create soltanto quando la data prevista entra nella finestra dei 10 giorni successivi. In questo modo il piano può essere preparato in anticipo senza saturare la coda Buffer.
+
 I file allegati alla proprietà `Media` vengono copiati in `media/notion/<chiave>/`. La prima esecuzione prepara e pubblica i file; una successiva esecuzione verifica gli URL GitHub Pages e programma il contenuto in Buffer. Sono supportati feed singoli, caroselli, Stories e Reel MP4.
 
 Secrets richiesti:
