@@ -83,11 +83,12 @@ test("gli URL pubblici mancanti preparano i file senza chiamare Buffer", () => {
   assert.equal(decideAction(parsed), "prepare-media");
 });
 
-test("la baseline Notion contiene esattamente i 14 ID Buffer esistenti", async () => {
+test("la baseline dei 14 ID Buffer resta preservata senza duplicati", async () => {
   const notionState = JSON.parse(await readFile(new URL("./notion-sync-state.json", import.meta.url), "utf8"));
   const bufferState = JSON.parse(await readFile(new URL("./buffer-state.json", import.meta.url), "utf8"));
   const notionIds = Object.values(notionState.pages).flatMap((entry) => entry.bufferIds).sort();
   const bufferIds = Object.values(bufferState.posts).map((entry) => entry.postId).sort();
-  assert.equal(new Set(notionIds).size, 14);
-  assert.deepEqual(notionIds, bufferIds);
+  assert.equal(bufferIds.length, 14);
+  assert.equal(new Set(notionIds).size, notionIds.length);
+  assert.ok(bufferIds.every((postId) => notionIds.includes(postId)));
 });

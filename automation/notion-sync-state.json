@@ -162,7 +162,14 @@
       "bufferIds": [
         "6a8858491b38003a90cd3cc6"
       ],
-      "jobs": {}
+      "status": "published",
+      "jobs": {
+        "0": {
+          "postId": "6a8858491b38003a90cd3cc6",
+          "status": "sent",
+          "dueAt": "2026-08-21T13:59:00.000Z"
+        }
+      }
     }
   },
   "updatedAt": "2026-08-21T13:59:14.160Z"
