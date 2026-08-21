@@ -25,8 +25,9 @@
     },
     "2026-08-23-sito-ai": {
       "postId": "6a8845121b38003a90cba8f8",
-      "status": "draft",
-      "dueAt": "2026-08-23T09:00:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-08-23T09:00:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-08-25-ascolto-01": {
       "postId": "6a8782ced9b0b836e20d1f39",
@@ -84,20 +85,22 @@
     },
     "2026-09-01-priorita-03": {
       "postId": "6a8782d2becc101a46351be7",
-      "status": "draft",
+      "status": "scheduled",
       "dueAt": "2026-09-01T10:32:00.000Z",
-      "error": "Programmazione 2026-09-01-priorita-03: Scheduled posts limit reached. You have 10 scheduled posts out of 10 allowed."
+      "bufferStatus": "scheduled"
     },
     "2026-09-04-sito": {
       "postId": "6a8782d25b4a6e681b1b54c6",
-      "status": "draft",
-      "dueAt": "2026-09-04T16:30:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-09-04T16:30:00.000Z",
+      "bufferStatus": "scheduled"
     },
     "2026-09-06-referente": {
       "postId": "6a8782d35b4a6e681b1b54de",
-      "status": "draft",
-      "dueAt": "2026-09-06T09:00:00.000Z"
+      "status": "scheduled",
+      "dueAt": "2026-09-06T09:00:00.000Z",
+      "bufferStatus": "scheduled"
     }
   },
-  "updatedAt": "2026-08-21T12:31:14.749Z"
+  "updatedAt": "2026-08-21T12:33:02.000Z"
 }
