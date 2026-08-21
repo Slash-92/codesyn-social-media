@@ -156,7 +156,14 @@
           "dueAt": "2026-09-06T09:00:00.000Z"
         }
       }
+    },
+    "3c300188-58b9-812e-9b09-cfa9df3f7d86": {
+      "key": "2026-08-21-test-manifesto-republish-01",
+      "bufferIds": [
+        "6a8858491b38003a90cd3cc6"
+      ],
+      "jobs": {}
     }
   },
-  "updatedAt": "2026-08-21T13:41:43.888Z"
+  "updatedAt": "2026-08-21T13:59:14.160Z"
 }
