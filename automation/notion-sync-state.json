@@ -184,7 +184,91 @@
         }
       },
       "status": "scheduled"
+    },
+    "3c400188-58b9-8161-9b61-c411bfc92187": {
+      "key": "2026-08-30-cosa-troverai-codesyn",
+      "bufferIds": [
+        "6a894d1762b911df3f135465"
+      ],
+      "jobs": {
+        "0": {
+          "postId": "6a894d1762b911df3f135465",
+          "status": "scheduled",
+          "dueAt": "2026-08-30T16:30:00.000Z"
+        }
+      },
+      "status": "scheduled"
+    },
+    "3c400188-58b9-8164-8468-fbe8fa37f54f": {
+      "key": "2026-08-24-prima-di-un-sito",
+      "bufferIds": [
+        "6a894d1bdc319146a28be783"
+      ],
+      "jobs": {
+        "0": {
+          "postId": "6a894d1bdc319146a28be783",
+          "status": "scheduled",
+          "dueAt": "2026-08-24T09:00:00.000Z"
+        }
+      },
+      "status": "scheduled"
+    },
+    "3c400188-58b9-8194-a757-f2e078285e19": {
+      "key": "2026-08-26-attivita-perdere-tempo",
+      "bufferIds": [
+        "6a894d1e3869cf66589f1827"
+      ],
+      "jobs": {
+        "0": {
+          "postId": "6a894d1e3869cf66589f1827",
+          "status": "scheduled",
+          "dueAt": "2026-08-26T09:00:00.000Z"
+        }
+      },
+      "status": "scheduled"
+    },
+    "3c400188-58b9-81b9-a1f3-e28d7ea9ea7b": {
+      "key": "2026-08-29-frasi-processo-confuso",
+      "bufferIds": [
+        "6a894d21dc319146a28be7bc"
+      ],
+      "jobs": {
+        "0": {
+          "postId": "6a894d21dc319146a28be7bc",
+          "status": "scheduled",
+          "dueAt": "2026-08-29T09:00:00.000Z"
+        }
+      },
+      "status": "scheduled"
+    },
+    "3c400188-58b9-81da-a741-db90ef3be036": {
+      "key": "2026-08-25-sito-dopo-pubblicazione",
+      "bufferIds": [
+        "6a894d233869cf66589f1862"
+      ],
+      "jobs": {
+        "0": {
+          "postId": "6a894d233869cf66589f1862",
+          "status": "scheduled",
+          "dueAt": "2026-08-25T16:30:00.000Z"
+        }
+      },
+      "status": "scheduled"
+    },
+    "3c400188-58b9-81e8-8016-cdffd336c9cd": {
+      "key": "2026-08-27-non-sempre-serve-app",
+      "bufferIds": [
+        "6a894d25dc319146a28be7f5"
+      ],
+      "jobs": {
+        "0": {
+          "postId": "6a894d25dc319146a28be7f5",
+          "status": "scheduled",
+          "dueAt": "2026-08-27T09:00:00.000Z"
+        }
+      },
+      "status": "scheduled"
     }
   },
-  "updatedAt": "2026-08-22T07:07:36.540Z"
+  "updatedAt": "2026-08-22T07:18:07.727Z"
 }
