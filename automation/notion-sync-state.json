@@ -170,7 +170,21 @@
           "dueAt": "2026-08-21T13:59:00.000Z"
         }
       }
+    },
+    "3c400188-58b9-81a5-96af-d585b6611051": {
+      "key": "2026-08-28-checklist-ecommerce",
+      "bufferIds": [
+        "6a894aacc5db1e9cdcdd54e9"
+      ],
+      "jobs": {
+        "0": {
+          "postId": "6a894aacc5db1e9cdcdd54e9",
+          "status": "scheduled",
+          "dueAt": "2026-08-28T09:00:00.000Z"
+        }
+      },
+      "status": "scheduled"
     }
   },
-  "updatedAt": "2026-08-22T06:55:47.617Z"
+  "updatedAt": "2026-08-22T07:07:36.540Z"
 }
