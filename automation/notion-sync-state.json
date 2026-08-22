@@ -193,11 +193,11 @@
       "jobs": {
         "0": {
           "postId": "6a894d1762b911df3f135465",
-          "status": "scheduled",
-          "dueAt": "2026-08-30T16:30:00.000Z"
+          "status": "sent",
+          "dueAt": "2026-08-22T12:02:00.000Z"
         }
       },
-      "status": "scheduled"
+      "status": "published"
     },
     "3c400188-58b9-8164-8468-fbe8fa37f54f": {
       "key": "2026-08-24-prima-di-un-sito",
@@ -270,5 +270,5 @@
       "status": "scheduled"
     }
   },
-  "updatedAt": "2026-08-22T07:18:07.727Z"
+  "updatedAt": "2026-08-22T18:45:32.809Z"
 }
