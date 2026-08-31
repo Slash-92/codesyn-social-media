@@ -42,7 +42,7 @@ Il workflow `Notion Buffer sync` controlla il piano editoriale Codesyn alle 08:0
 
 Il campo `Buffer IDs` è la protezione principale contro i duplicati. Se contiene uno o più ID, il workflow esegue esclusivamente una riconciliazione dello stato e non crea nuovi post. Anche `automation/notion-sync-state.json` conserva gli ID dopo ogni creazione.
 
-Le nuove pubblicazioni senza ID Buffer vengono create soltanto quando la data prevista entra nella finestra dei 10 giorni successivi. In questo modo il piano può essere preparato in anticipo senza saturare la coda Buffer.
+Le nuove pubblicazioni senza ID Buffer vengono create soltanto quando la data prevista entra nella finestra dei 30 giorni successivi. In questo modo il piano può essere preparato in anticipo mantenendo in Buffer un orizzonte editoriale controllabile.
 
 Le righe già marcate `Pubblicato` non vengono più interrogate nelle esecuzioni successive. Se Buffer restituisce il limite temporaneo `429`, il ciclo si ferma al primo rifiuto e riprova alla sincronizzazione seguente senza trasformare tutte le righe restanti in errori.
 

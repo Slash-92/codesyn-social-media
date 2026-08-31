@@ -111,6 +111,12 @@ test("una nuova pubblicazione resta differita oltre l'orizzonte Buffer", () => {
   assert.equal(shouldDeferCreation("data-non-valida", now, 10), false);
 });
 
+test("l'orizzonte Buffer predefinito e di trenta giorni", () => {
+  const now = new Date("2026-08-31T00:00:00.000Z");
+  assert.equal(shouldDeferCreation("2026-09-26T09:00:00.000Z", now), false);
+  assert.equal(shouldDeferCreation("2026-10-01T09:00:00.000Z", now), true);
+});
+
 test("una riga già pubblicata non consuma più richieste Buffer", () => {
   const published = parseNotionPage(pageFixture({ Stato: { type: "select", select: { name: "Pubblicato" } } }));
   const scheduled = parseNotionPage(pageFixture({ Stato: { type: "select", select: { name: "Programmato" } } }));
