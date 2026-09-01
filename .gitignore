@@ -1,0 +1,4 @@
+.env
+.env.*
+automation/notion-sync-state.json
+automation/buffer-state.json

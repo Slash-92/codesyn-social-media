@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { decryptState, encryptState } from "./state-store.mjs";
 import {
   buildBufferInput,
   buildJobs,
@@ -93,6 +93,18 @@ test("gli URL pubblici mancanti preparano i file senza chiamare Buffer", () => {
   assert.equal(decideAction(parsed), "prepare-media");
 });
 
+test("gli allegati con estensione non consentita non entrano nella pipeline", () => {
+  const parsed = parseNotionPage(pageFixture({
+    "URL media pubblici": richText(""),
+    Media: {
+      type: "files",
+      files: [{ name: "pagina.html", type: "external", external: { url: "https://example.com/pagina.html" } }],
+    },
+  }));
+  assert.equal(parsed.mediaFiles.length, 0);
+  assert.equal(decideAction(parsed), "missing-media");
+});
+
 test("lo stato transitorio sending resta gestibile senza falso errore", () => {
   assert.equal(isManageableBufferStatus("sending"), true);
   assert.equal(deriveEntryStatus(["sending"]), "scheduled");
@@ -111,10 +123,10 @@ test("una nuova pubblicazione resta differita oltre l'orizzonte Buffer", () => {
   assert.equal(shouldDeferCreation("data-non-valida", now, 10), false);
 });
 
-test("l'orizzonte Buffer predefinito e di trenta giorni", () => {
+test("l'orizzonte Buffer predefinito e di cinque giorni", () => {
   const now = new Date("2026-08-31T00:00:00.000Z");
-  assert.equal(shouldDeferCreation("2026-09-26T09:00:00.000Z", now), false);
-  assert.equal(shouldDeferCreation("2026-10-01T09:00:00.000Z", now), true);
+  assert.equal(shouldDeferCreation("2026-09-05T00:00:00.000Z", now), false);
+  assert.equal(shouldDeferCreation("2026-09-06T00:00:01.000Z", now), true);
 });
 
 test("una riga già pubblicata non consuma più richieste Buffer", () => {
@@ -124,12 +136,23 @@ test("una riga già pubblicata non consuma più richieste Buffer", () => {
   assert.equal(isEligibleSyncPage(scheduled), true);
 });
 
-test("la baseline dei 14 ID Buffer resta preservata senza duplicati", async () => {
-  const notionState = JSON.parse(await readFile(new URL("./notion-sync-state.json", import.meta.url), "utf8"));
-  const bufferState = JSON.parse(await readFile(new URL("./buffer-state.json", import.meta.url), "utf8"));
-  const notionIds = Object.values(notionState.pages).flatMap((entry) => entry.bufferIds).sort();
-  const bufferIds = Object.values(bufferState.posts).map((entry) => entry.postId).sort();
-  assert.equal(bufferIds.length, 14);
-  assert.equal(new Set(notionIds).size, notionIds.length);
-  assert.ok(bufferIds.every((postId) => notionIds.includes(postId)));
+test("lo stato cifrato non espone gli ID e torna identico dopo la decifratura", () => {
+  const key = Buffer.alloc(32, 7).toString("base64");
+  const state = { schemaVersion: 1, pages: { "notion-page-id": { bufferIds: ["buffer-post-id"] } } };
+  const envelope = encryptState(state, key);
+  assert.equal(JSON.stringify(envelope).includes("notion-page-id"), false);
+  assert.equal(JSON.stringify(envelope).includes("buffer-post-id"), false);
+  assert.deepEqual(decryptState(envelope, key), state);
+});
+
+test("anche la preparazione media resta differita oltre l'orizzonte", () => {
+  const parsed = parseNotionPage(pageFixture({
+    "URL media pubblici": richText(""),
+    Media: {
+      type: "files",
+      files: [{ name: "slide.png", type: "external", external: { url: "https://example.com/slide.png" } }],
+    },
+  }));
+  assert.equal(decideAction(parsed), "prepare-media");
+  assert.equal(shouldDeferCreation(parsed.dueAt, new Date("2026-09-01T00:00:00.000Z"), 5), true);
 });

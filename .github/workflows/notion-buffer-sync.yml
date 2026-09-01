@@ -16,33 +16,36 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    env:
-      NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
-      NOTION_DATA_SOURCE_ID: [REMOVED_NOTION_DATA_SOURCE_ID]
-      BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
-      BUFFER_CHANNEL_ID: ${{ secrets.BUFFER_CHANNEL_ID }}
-      BUFFER_SCHEDULE_HORIZON_DAYS: 30
-      PUBLIC_MEDIA_BASE_URL: https://slash-92.github.io/codesyn-social-media/media
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 24
       - name: Test migration and idempotency rules
         run: node --test automation/notion-sync.test.mjs
       - name: Sync approved Notion content
-        if: env.NOTION_API_TOKEN != ''
-        run: node automation/notion-sync.mjs
-      - name: Notion integration not configured yet
-        if: env.NOTION_API_TOKEN == ''
-        run: echo "NOTION_API_TOKEN assente; la programmazione Buffer esistente resta invariata."
+        env:
+          NOTION_API_TOKEN: ${{ secrets.NOTION_API_TOKEN }}
+          NOTION_DATA_SOURCE_ID: ${{ secrets.NOTION_DATA_SOURCE_ID }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          BUFFER_CHANNEL_ID: ${{ secrets.BUFFER_CHANNEL_ID }}
+          STATE_ENCRYPTION_KEY: ${{ secrets.STATE_ENCRYPTION_KEY }}
+          BUFFER_SCHEDULE_HORIZON_DAYS: 5
+          PUBLIC_MEDIA_BASE_URL: https://slash-92.github.io/codesyn-social-media/media
+        run: |
+          test -n "$NOTION_API_TOKEN"
+          test -n "$NOTION_DATA_SOURCE_ID"
+          test -n "$BUFFER_API_KEY"
+          test -n "$BUFFER_CHANNEL_ID"
+          test -n "$STATE_ENCRYPTION_KEY"
+          node automation/notion-sync.mjs
       - name: Save media and idempotency state
         if: always()
         run: |
-          git add -- automation/notion-sync-state.json
+          git add -- automation/notion-sync-state.enc.json
           if [ -d media/notion ]; then
             git add -- media/notion
           fi

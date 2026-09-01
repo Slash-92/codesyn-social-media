@@ -1,19 +1,27 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import { readEncryptedState, writeEncryptedState } from "./state-store.mjs";
 
 const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION = "2026-03-11";
 const BUFFER_API = "https://api.buffer.com";
-const DEFAULT_DATA_SOURCE_ID = "[REMOVED_NOTION_DATA_SOURCE_ID]";
 const DEFAULT_MEDIA_BASE = "https://slash-92.github.io/codesyn-social-media/media";
-const DEFAULT_SCHEDULE_HORIZON_DAYS = 30;
+const DEFAULT_SCHEDULE_HORIZON_DAYS = 5;
+const MAX_MEDIA_BYTES = 50 * 1024 * 1024;
+const ALLOWED_MEDIA = new Map([
+  [".png", new Set(["image/png", "application/octet-stream"])],
+  [".jpg", new Set(["image/jpeg", "application/octet-stream"])],
+  [".jpeg", new Set(["image/jpeg", "application/octet-stream"])],
+  [".webp", new Set(["image/webp", "application/octet-stream"])],
+  [".mp4", new Set(["video/mp4", "application/octet-stream"])],
+]);
 const MANAGEABLE_BUFFER_STATUSES = new Set(["sent", "published", "scheduled", "buffer", "sending"]);
 const scriptDir = import.meta.dirname;
 const repoRoot = path.resolve(scriptDir, "..");
 const statePath = process.env.NOTION_SYNC_STATE_PATH
   ? path.resolve(process.env.NOTION_SYNC_STATE_PATH)
-  : path.join(scriptDir, "notion-sync-state.json");
+  : path.join(scriptDir, "notion-sync-state.enc.json");
 
 export function isManageableBufferStatus(status) {
   return MANAGEABLE_BUFFER_STATUSES.has(status);
@@ -27,18 +35,9 @@ function hasFlag(flag) {
   return process.argv.includes(flag);
 }
 
-async function readJson(filePath, fallback) {
-  try {
-    return JSON.parse(await readFile(filePath, "utf8"));
-  } catch (error) {
-    if (error.code === "ENOENT") return fallback;
-    throw error;
-  }
-}
-
 async function saveState(state) {
   state.updatedAt = new Date().toISOString();
-  await writeFile(statePath, `${JSON.stringify(state, null, 2)}\n`);
+  await writeEncryptedState(statePath, state);
 }
 
 function richTextValue(property) {
@@ -67,7 +66,14 @@ function propertyFile(file, index) {
   const url = file.type === "external" ? file.external?.url : file.file?.url;
   if (!url) return null;
   const rawName = file.name || `asset-${index + 1}`;
-  const extension = path.extname(new URL(url).pathname) || path.extname(rawName);
+  let urlPath;
+  try {
+    urlPath = new URL(url).pathname;
+  } catch {
+    return null;
+  }
+  const extension = path.extname(urlPath) || path.extname(rawName);
+  if (!ALLOWED_MEDIA.has(extension.toLowerCase())) return null;
   const stem = path.basename(rawName, path.extname(rawName));
   const safeStem = sanitizeSegment(stem) || `asset-${index + 1}`;
   return { name: `${String(index + 1).padStart(2, "0")}-${safeStem}${extension.toLowerCase()}`, url };
@@ -168,12 +174,13 @@ async function notionRequest(endpoint, { method = "GET", body } = {}) {
     headers: { Authorization: `Bearer ${token}`, "Notion-Version": NOTION_VERSION, "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!response.ok) throw new Error(`Notion HTTP ${response.status}: ${await response.text()}`);
+  if (!response.ok) throw new Error(`Notion HTTP ${response.status}`);
   return response.json();
 }
 
 async function queryNotionPages() {
-  const dataSourceId = process.env.NOTION_DATA_SOURCE_ID || DEFAULT_DATA_SOURCE_ID;
+  const dataSourceId = process.env.NOTION_DATA_SOURCE_ID;
+  if (!dataSourceId) throw new Error("NOTION_DATA_SOURCE_ID non configurato");
   const pages = [];
   let cursor;
   do {
@@ -211,13 +218,13 @@ async function bufferRequest(query, variables) {
     body: JSON.stringify({ query, variables }),
   });
   if (!response.ok) {
-    const message = `Buffer HTTP ${response.status}: ${await response.text()}`;
+    const message = `Buffer HTTP ${response.status}`;
     const error = new Error(message);
     if (response.status === 429) error.code = "BUFFER_RATE_LIMIT";
     throw error;
   }
   const payload = await response.json();
-  if (payload.errors?.length) throw new Error(`Buffer GraphQL: ${payload.errors.map((error) => error.message).join("; ")}`);
+  if (payload.errors?.length) throw new Error("Buffer GraphQL: operazione rifiutata");
   return payload.data;
 }
 
@@ -246,7 +253,18 @@ async function prepareMedia(page) {
   for (const file of page.mediaFiles) {
     const response = await fetch(file.url, { redirect: "follow" });
     if (!response.ok) throw new Error(`Download asset fallito (${response.status}): ${file.name}`);
-    await writeFile(path.join(targetDir, file.name), new Uint8Array(await response.arrayBuffer()));
+    const extension = path.extname(file.name).toLowerCase();
+    const contentType = (response.headers.get("content-type") || "").split(";", 1)[0].toLowerCase();
+    if (!ALLOWED_MEDIA.get(extension)?.has(contentType)) {
+      throw new Error(`Tipo media non consentito: ${file.name}`);
+    }
+    const declaredLength = Number(response.headers.get("content-length"));
+    if (Number.isFinite(declaredLength) && declaredLength > MAX_MEDIA_BYTES) {
+      throw new Error(`Media troppo grande: ${file.name}`);
+    }
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength > MAX_MEDIA_BYTES) throw new Error(`Media troppo grande: ${file.name}`);
+    await writeFile(path.join(targetDir, file.name), bytes);
     publicUrls.push(`${baseUrl}/notion/${encodeURIComponent(safeKey)}/${encodeURIComponent(file.name)}`);
   }
   await updateNotion(page.id, { publicUrls, error: "", syncedAt: new Date().toISOString() });
@@ -326,26 +344,26 @@ async function reconcile(page, jobs, state) {
 
 async function main() {
   if (hasFlag("--validate-config")) {
-    console.log(JSON.stringify({ notionDataSourceId: process.env.NOTION_DATA_SOURCE_ID || DEFAULT_DATA_SOURCE_ID, publicMediaBaseUrl: process.env.PUBLIC_MEDIA_BASE_URL || DEFAULT_MEDIA_BASE }, null, 2));
+    console.log(JSON.stringify({ notionDataSourceConfigured: Boolean(process.env.NOTION_DATA_SOURCE_ID), publicMediaBaseUrl: process.env.PUBLIC_MEDIA_BASE_URL || DEFAULT_MEDIA_BASE }, null, 2));
     return;
   }
   const dryRun = hasFlag("--dry-run");
   const pages = await queryNotionPages();
-  const state = await readJson(statePath, { schemaVersion: 1, pages: {} });
+  const state = await readEncryptedState(statePath, { schemaVersion: 1, pages: {} });
   const horizonDays = Number.parseFloat(process.env.BUFFER_SCHEDULE_HORIZON_DAYS || String(DEFAULT_SCHEDULE_HORIZON_DAYS));
   const summary = { total: pages.length, ignored: 0, deferred: 0, preparedMedia: 0, created: 0, reconciled: 0, errors: 0, rateLimited: false };
-  for (const page of pages) {
+  for (const [pageIndex, page] of pages.entries()) {
     if (!isEligibleSyncPage(page)) {
       summary.ignored += 1;
       continue;
     }
     const action = decideAction(page, state.pages[page.id]);
-    if (action === "create" && shouldDeferCreation(page.dueAt, new Date(), horizonDays)) {
+    if (["create", "prepare-media"].includes(action) && shouldDeferCreation(page.dueAt, new Date(), horizonDays)) {
       summary.deferred += 1;
       continue;
     }
     if (dryRun) {
-      console.log(JSON.stringify({ page: page.title, key: page.key, action, bufferIds: page.bufferIds }, null, 2));
+      console.log(JSON.stringify({ page: pageIndex + 1, action, hasBufferIds: page.bufferIds.length > 0 }, null, 2));
       continue;
     }
     try {
@@ -371,11 +389,11 @@ async function main() {
     } catch (error) {
       if (error.code === "BUFFER_RATE_LIMIT") {
         summary.rateLimited = true;
-        console.warn(`${page.key}: limite Buffer raggiunto; sincronizzazione interrotta e rinviata al prossimo passaggio.`);
+        console.warn("Limite Buffer raggiunto; sincronizzazione interrotta e rinviata al prossimo passaggio.");
         break;
       }
       summary.errors += 1;
-      console.error(`${page.key}: ${error.message}`);
+      console.error(`Errore automazione sulla riga ${pageIndex + 1}; dettaglio registrato in Notion.`);
       await updateNotion(page.id, { status: "Errore automazione", error: error.message, syncedAt: new Date().toISOString() });
     }
   }
